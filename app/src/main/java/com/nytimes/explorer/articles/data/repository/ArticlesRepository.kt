@@ -25,8 +25,6 @@ class ArticlesRepository(
             val remoteDocs = api.getArticleSearch(keyword, "N3AhIAieRGr8KA0iIGGAg1DVFgpvX4Bw")?.response?.docs
             emit(Resource.Success(remoteDocs))
 
-            Log.d("testBassem", remoteDocs.toString())
-            Log.d("testBassem", remoteDocs[1].toString())
 
             dao.deleteArticles(keyword)
             dao.insertArticles(ArticlesEntity(keyword, remoteDocs))

@@ -1,16 +1,17 @@
 package com.nytimes.explorer.articles.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -22,27 +23,35 @@ fun Article(
     article: Article,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
-        Text(
-            text = article.headline.main,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Text(
-            text = article.byline?.original ?: "",
-            fontWeight = FontWeight.Light,
-        )
 
+    val imageUrl = article.multimedia.firstOrNull { !it.url.isNullOrBlank() }?.url
 
-    }
-    Column() {
+    val rowScale = if (imageUrl.isNullOrBlank()) 1.0f else 0.7f
+    Row(
+        modifier = modifier.padding(top = 8.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.fillMaxWidth(rowScale)) {
+            Text(
+                text = article.headline.main,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Text(
+                text = article.byline?.original ?: "",
+                fontWeight = FontWeight.Light,
+            )
+        }
         Image(
-            painter = rememberImagePainter(article.multimedia.firstOrNull()?.url),
+            painter = rememberImagePainter("https://static01.nyt.com/${imageUrl}"),
             contentDescription = null,
-            modifier = Modifier.size(20.dp)
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(100.dp)
         )
     }
-    Spacer(modifier = Modifier.height(16.dp))
-
 }
+
+
+

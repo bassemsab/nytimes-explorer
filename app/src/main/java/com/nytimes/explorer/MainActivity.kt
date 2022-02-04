@@ -63,11 +63,7 @@ class MainActivity : ComponentActivity() {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 items(state.articles.size) { i ->
                                     val article = state.articles[i]
-
-                                    if (i > 0) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    }
-                                    Article(article)
+                                    Article(article, modifier = Modifier.fillMaxWidth())
                                     if (i < state.articles.size - 1) {
                                         Divider()
                                     }
