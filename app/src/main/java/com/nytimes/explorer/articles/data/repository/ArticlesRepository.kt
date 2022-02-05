@@ -20,7 +20,6 @@ class ArticlesRepository(
 //        val articles = dao.getArticles(keyword).articles
 //        emit(Resource.Loading(articles))
         try {
-            Log.d("testBassem", "before${String}")
 
             val remoteDocs = api.getArticleSearch(keyword, "N3AhIAieRGr8KA0iIGGAg1DVFgpvX4Bw")?.response?.docs
             emit(Resource.Success(remoteDocs))

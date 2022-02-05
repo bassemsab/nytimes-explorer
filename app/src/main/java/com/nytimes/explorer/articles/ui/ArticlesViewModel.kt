@@ -8,10 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.nytimes.explorer.articles.data.repository.ArticlesRepository
 import com.nytimes.explorer.core.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -23,46 +21,40 @@ class ArticlesViewModel @Inject constructor(
     private val repository: ArticlesRepository
 ) : ViewModel() {
 
-    private val _searchQuery = mutableStateOf("")
-    val searchQuery: State<String> = _searchQuery
+    val searchQuery = mutableStateOf("")
 
-    private val _state = mutableStateOf(ArticlesState())
-    val state: State<ArticlesState> = _state
+    val state = mutableStateOf(ArticlesState())
 
-    private val _eventFlow = MutableSharedFlow<UIEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
-
-
-    private var searchJob: Job? = null
+    val eventFlow = MutableSharedFlow<UIEvent>()
 
     //debounce search query
-    fun onSearch(query: String) {
-        _searchQuery.value = query
-        searchJob?.cancel()
+    fun onSearch() {
+        state.value = state.value.copy(
+            isLoading = true
+        )
 
         viewModelScope.launch {
-            delay(500L)
-            repository.getArticles(query).onEach { results ->
+            repository.getArticles(searchQuery.value).onEach { results ->
                 when (results) {
                     is Resource.Success -> {
-                        _state.value = state.value.copy(
+                        state.value = state.value.copy(
                             articles = results.data ?: emptyList(),
                             isLoading = false
                         )
                     }
                     is Resource.Error -> {
-                        _state.value = state.value.copy(
+                        state.value = state.value.copy(
                             articles = results.data ?: emptyList(),
                             isLoading = false
                         )
-                        _eventFlow.emit(
+                        eventFlow.emit(
                             UIEvent.ShowSnackbar(
                                 results.message ?: "Unknown error"
                             )
                         )
                     }
                     is Resource.Loading -> {
-                        _state.value = state.value.copy(
+                        state.value = state.value.copy(
                             articles = results.data ?: emptyList(),
                             isLoading = true
                         )
