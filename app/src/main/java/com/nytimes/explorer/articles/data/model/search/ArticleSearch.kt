@@ -1,4 +1,4 @@
-package com.nytimes.explorer.articles.data.model
+package com.nytimes.explorer.articles.data.model.search
 
 
 data class ArticleSearch(

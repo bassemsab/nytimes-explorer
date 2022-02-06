@@ -3,7 +3,7 @@ package com.nytimes.explorer.articles.data.local
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.google.gson.reflect.TypeToken
-import com.nytimes.explorer.articles.data.model.Article
+import com.nytimes.explorer.articles.data.model.search.Article
 import com.nytimes.explorer.core.util.JsonParser
 
 @ProvidedTypeConverter

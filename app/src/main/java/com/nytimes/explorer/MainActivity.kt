@@ -3,6 +3,7 @@ package com.nytimes.explorer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.nytimes.explorer.articles.data.remote.NytApi
 import com.nytimes.explorer.articles.ui.Article
 import com.nytimes.explorer.articles.ui.ArticlesViewModel
 import com.nytimes.explorer.ui.theme.ExplorerTheme
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.collectLatest
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             ExplorerTheme {
                 val viewModel: ArticlesViewModel = hiltViewModel()
@@ -46,7 +49,10 @@ class MainActivity : ComponentActivity() {
                 val query = viewModel.searchQuery
                 val scaffoldState = rememberScaffoldState()
 
+
                 LaunchedEffect(key1 = true) {
+                    viewModel.onSearch(NytApi.MOST_SHARED)
+
                     viewModel.eventFlow.collectLatest { event ->
                         when (event) {
                             is ArticlesViewModel.UIEvent.ShowSnackbar -> {
@@ -79,7 +85,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                                 keyboardActions = KeyboardActions(onSearch = {
-                                    viewModel.onSearch()
+                                    viewModel.onSearch("")
                                     focusManager.clearFocus()
                                 }),
                                 trailingIcon = {
@@ -102,20 +108,25 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Button(
                                         modifier = Modifier.padding(4.dp),
-
-                                        onClick = {}
+                                        onClick = {
+                                            viewModel.onSearch(NytApi.MOST_VIEWED)
+                                        }
                                     ) {
                                         Text("Most viewed")
                                     }
                                     Button(
                                         modifier = Modifier.padding(4.dp),
-                                        onClick = {}
+                                        onClick = {
+                                            viewModel.onSearch(NytApi.MOST_SHARED)
+                                        }
                                     ) {
                                         Text("Most Shared")
                                     }
                                     Button(
                                         modifier = Modifier.padding(4.dp),
-                                        onClick = {}
+                                        onClick = {
+                                            viewModel.onSearch(NytApi.MOST_EMAILED)
+                                        }
                                     ) {
                                         Text("Most Emailed")
                                     }

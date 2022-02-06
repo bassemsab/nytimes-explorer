@@ -27,14 +27,13 @@ class ArticlesViewModel @Inject constructor(
 
     val eventFlow = MutableSharedFlow<UIEvent>()
 
-    //debounce search query
-    fun onSearch() {
+    fun onSearch(media: String) {
         state.value = state.value.copy(
             isLoading = true
         )
 
         viewModelScope.launch {
-            repository.getArticles(searchQuery.value).onEach { results ->
+            repository.getArticles(searchQuery.value, media).onEach { results ->
                 when (results) {
                     is Resource.Success -> {
                         state.value = state.value.copy(
@@ -66,6 +65,7 @@ class ArticlesViewModel @Inject constructor(
 
         }
     }
+
 
     sealed class UIEvent {
         data class ShowSnackbar(val message: String) : UIEvent()
