@@ -68,14 +68,14 @@ fun Article(
                 val toFormat = SimpleDateFormat("EEE, dd-MM-yyyy HH:mm")
                 toFormat.timeZone = TimeZone.getDefault()
                 val d1 = df.parse(article.pub_date)
-                val date = toFormat.format(d1)
+                date = toFormat.format(d1)
 
 
             } else {
                 val df = SimpleDateFormat("yyyy-MM-dd")
                 val toFormat = SimpleDateFormat("EEE, dd-MM-yyyy")
                 val d1 = df.parse(article.pub_date)
-                val date = toFormat.format(d1)
+                date = toFormat.format(d1)
             }
             if (date.isNotBlank()) {
                 Text(

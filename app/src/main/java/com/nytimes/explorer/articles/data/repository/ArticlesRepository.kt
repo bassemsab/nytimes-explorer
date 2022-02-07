@@ -1,5 +1,6 @@
 package com.nytimes.explorer.articles.data.repository
 
+import android.util.Log
 import com.nytimes.explorer.core.util.Resource
 import com.nytimes.explorer.articles.data.local.ArticlesDao
 import com.nytimes.explorer.articles.data.local.entity.ArticlesEntity
@@ -15,10 +16,18 @@ class ArticlesRepository(
     private val api: NytApi,
     private val dao: ArticlesDao
 ) {
-    fun getArticles(keyword: String, media: String): Flow<Resource<List<Article>>> = flow {
+    fun getArticles(kw: String, media: String, page: Int): Flow<Resource<List<Article>>> = flow {
+        var keyword = kw
+        if (media.isNotBlank()) { // to cache different media criteria in DB
+            keyword = media
+        } else {
+            keyword += ".$page"
+        }
+
+
         val articles = dao?.getArticles(keyword)?.articles
 
-        emit(Resource.Loading(articles))
+        emit(Resource.Loading(emptyList()))
 
         try {
 
@@ -27,7 +36,7 @@ class ArticlesRepository(
                 api.getPopularArticles(media, social).toArticles()
 
             } else {
-                api.getArticleSearch(keyword, 0).response.docs
+                api.getArticleSearch(keyword, page).response.docs
             }
 
 
@@ -42,7 +51,9 @@ class ArticlesRepository(
 
         }
         val newArticles = dao?.getArticles(keyword)?.articles
+
         emit(Resource.Success(newArticles))
+
 
     }
 

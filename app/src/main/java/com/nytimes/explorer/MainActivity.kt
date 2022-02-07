@@ -1,6 +1,7 @@
 package com.nytimes.explorer
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
@@ -32,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nytimes.explorer.articles.data.remote.NytApi
 import com.nytimes.explorer.articles.ui.Article
 import com.nytimes.explorer.articles.ui.ArticlesViewModel
+import com.nytimes.explorer.articles.ui.PAGE_SIZE
 import com.nytimes.explorer.ui.theme.ExplorerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -80,6 +82,7 @@ class MainActivity : ComponentActivity() {
                                 value = query.value,
                                 onValueChange = {
                                     query.value = it
+                                    state.articles = emptyList()
                                     state.isSearching = true
                                 },
                                 modifier = Modifier.fillMaxWidth(),
@@ -94,6 +97,7 @@ class MainActivity : ComponentActivity() {
                                         state.isLoading = false
                                         focusManager.clearFocus()
                                         query.value = ""
+                                        viewModel.onSearch(NytApi.MOST_SHARED)
 
                                     })
                                 },
@@ -137,6 +141,13 @@ class MainActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.height(16.dp))
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 items(state.articles.size) { i ->
+                                    if (state.isSearching) { //only search api has pagination
+                                        viewModel.onChangeScrollPosition(i)
+                                        if (state.articles.isNotEmpty() && i + 1 >= (state.page * PAGE_SIZE) && !state.isLoading) {
+                                            viewModel.incrementPage()
+                                            viewModel.onSearch("", state.page)
+                                        }
+                                    }
                                     val article = state.articles[i]
                                     Article(article, modifier = Modifier.fillMaxWidth())
                                     if (i < state.articles.size - 1) {
@@ -148,7 +159,7 @@ class MainActivity : ComponentActivity() {
 
                         }
 
-                        if (state.isLoading) {
+                        if (state.isLoading && state.articles.isEmpty()) {
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
                     }

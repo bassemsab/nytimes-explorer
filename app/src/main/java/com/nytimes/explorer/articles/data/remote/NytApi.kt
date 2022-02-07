@@ -13,7 +13,7 @@ interface NytApi {
     @GET("/svc/search/v2/articlesearch.json")
     suspend fun getArticleSearch(
         @Query("q") text: String,
-        @Query("page") page: Int,
+        @Query("page") page: Int? = 0,
         @Query("api-key") apiKey: String = BuildConfig.NYT_API_KEY
 
     ): ArticleSearch
